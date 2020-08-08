@@ -18,7 +18,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- out include dir
 IncludeDir = {}
-IncludeDir["GLFW"] = "vendor/GLFW/include"
+IncludeDir["GLFW"] = "vendor/GLFW/include" 
 IncludeDir["glad"] = "vendor/glad/include"
 IncludeDir["glm"] = "vendor/glm"
 IncludeDir["stb_image"] = "vendor/stb_image"
