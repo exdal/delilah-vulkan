@@ -1,12 +1,11 @@
 workspace "Delilah"
-    architecture "x86_64"
-    architecture "game"
+    platforms { "x86", "x86_64" }
+    startproject "Game"
 
     configurations
 	{
 		"Debug",
 		"Release",
-		"Dist"
 	}
 	
 	flags
@@ -16,16 +15,16 @@ workspace "Delilah"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
--- out include dir
+-- our include dir
 IncludeDir = {}
-IncludeDir["GLFW"] = "vendor/GLFW/include" 
 IncludeDir["glad"] = "vendor/glad/include"
+IncludeDir["GLFW"] = "vendor/glfw/include"
 IncludeDir["glm"] = "vendor/glm"
 IncludeDir["stb_image"] = "vendor/stb_image"
 IncludeDir["entt"] = "vendor/entt/include"
 
 group "Dependencies"
-	include "vendor/GLFW"
+	include "vendor/glfw"
 	include "vendor/glad"
 group ""
 
@@ -33,7 +32,7 @@ project "Engine"
 	location "engine"
 	kind "StaticLib"
 	language "C++"
-	cppialect "C++17"
+	cppdialect "C++17"
 	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -41,8 +40,8 @@ project "Engine"
 
 	files
 	{
-		"%{prj.name}/engine/**.h",
-		"%{prj.name}/engine/**.cpp",
+		"%{prj.name}/engine/src/**.h",
+		"%{prj.name}/engine/src/**.cpp",
 		"%{prj.name}/vendor/stb_image/**.h",
 		"%{prj.name}/vendor/stb_image/**.cpp",
 		"%{prj.name}/vendor/glm/glm/**.hpp",
@@ -57,7 +56,7 @@ project "Engine"
 
 	includedirs
 	{
-		"%{prj.name}",
+		"%{prj.name}/src",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glad}",
 		"%{IncludeDir.glm}",
@@ -90,6 +89,12 @@ project "Engine"
 		optimize "on"
 		symbols "off"
 
+	filter "platforms:x86"
+        architecture "x86"
+
+    filter "platforms:x64"
+        architecture "x86_64"
+
 project "Game"
 	location "game"
 	kind "WindowedApp"
@@ -102,13 +107,13 @@ project "Game"
 
 	files
 	{
-		"%{prj.name}/game/**.h",
-		"%{prj.name}/game/**.cpp"
+		"%{prj.name}/game/src/**.h",
+		"%{prj.name}/game/src/**.cpp"
 	}
 
 	includedirs
 	{
-		"engine",
+		"engine/src",
 		"vendor",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}"
@@ -132,3 +137,9 @@ project "Game"
 		runtime "Release"
 		optimize "on"
 		symbols "off"
+
+	filter "platforms:x86"
+        architecture "x86"
+
+    filter "platforms:x64"
+        architecture "x86_64"
