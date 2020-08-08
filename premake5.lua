@@ -18,11 +18,11 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- out include dir
 IncludeDir = {}
-IncludeDir["GLFW"] = "Hazel/vendor/GLFW/include"
-IncludeDir["glad"] = "Hazel/vendor/glad/include"
-IncludeDir["glm"] = "Hazel/vendor/glm"
-IncludeDir["stb_image"] = "Hazel/vendor/stb_image"
-IncludeDir["entt"] = "Hazel/vendor/entt/include"
+IncludeDir["GLFW"] = "vendor/GLFW/include"
+IncludeDir["glad"] = "vendor/glad/include"
+IncludeDir["glm"] = "vendor/glm"
+IncludeDir["stb_image"] = "vendor/stb_image"
+IncludeDir["entt"] = "vendor/entt/include"
 
 group "Dependencies"
 	include "vendor/GLFW"
