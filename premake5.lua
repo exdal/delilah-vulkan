@@ -26,9 +26,10 @@ IncludeDir["entt"] = "vendor/entt/include"
 group "Dependencies"
 	include "vendor/glfw"
 	include "vendor/glad"
+	include "vendor/glm"
 group ""
 
-project "Engine"
+project "engine"
 	location "engine"
 	kind "StaticLib"
 	language "C++"
@@ -40,12 +41,10 @@ project "Engine"
 
 	files
 	{
-		"%{prj.name}/engine/src/**.h",
-		"%{prj.name}/engine/src/**.cpp",
-		"%{prj.name}/vendor/stb_image/**.h",
-		"%{prj.name}/vendor/stb_image/**.cpp",
-		"%{prj.name}/vendor/glm/glm/**.hpp",
-		"%{prj.name}/vendor/glm/glm/**.inl",
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp",
+		"vendor/stb_image/**.h",
+		"vendor/stb_image/**.cpp"
 	}
 
 	defines
@@ -95,7 +94,7 @@ project "Engine"
     filter "platforms:x64"
         architecture "x86_64"
 
-project "Game"
+project "game"
 	location "game"
 	kind "WindowedApp"
 	language "C++"
@@ -107,8 +106,8 @@ project "Game"
 
 	files
 	{
-		"%{prj.name}/game/src/**.h",
-		"%{prj.name}/game/src/**.cpp"
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
 	}
 
 	includedirs
@@ -116,7 +115,9 @@ project "Game"
 		"engine/src",
 		"vendor",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.glad}"
 	}
 
 	links
