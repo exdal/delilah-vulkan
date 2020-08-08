@@ -41,8 +41,8 @@ project "Engine"
 
 	files
 	{
-		"%{prj.name}/engine/src/**.h",
-		"%{prj.name}/engine/src/**.cpp",
+		"%{prj.name}/engine/**.h",
+		"%{prj.name}/engine/**.cpp",
 		"%{prj.name}/vendor/stb_image/**.h",
 		"%{prj.name}/vendor/stb_image/**.cpp",
 		"%{prj.name}/vendor/glm/glm/**.hpp",
@@ -57,8 +57,7 @@ project "Engine"
 
 	includedirs
 	{
-		"%{prj.name}/src",
-		"%{prj.name}/vendor/spdlog/include",
+		"%{prj.name}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glad}",
 		"%{IncludeDir.glm}",
@@ -103,13 +102,13 @@ project "Game"
 
 	files
 	{
-		"%{prj.name}/game/src/**.h",
-		"%{prj.name}/game/src/**.cpp"
+		"%{prj.name}/game/**.h",
+		"%{prj.name}/game/**.cpp"
 	}
 
 	includedirs
 	{
-		"engine/src",
+		"engine",
 		"vendor",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}"
