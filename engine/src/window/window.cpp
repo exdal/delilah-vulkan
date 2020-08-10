@@ -1,5 +1,7 @@
 #include "window.h"
 
+static Window *s_window;
+
 void framebuffer_size_callback(GLFWwindow *handle, int width, int height) {
     auto window = (Window *)glfwGetWindowUserPointer(handle);
     /*auto camera = window->camera;
@@ -27,7 +29,9 @@ void mouse_position_callback(GLFWwindow *handle, double xpos, double ypos) {
     //window->mouse_pos = glm::vec2(xpos, ypos);
 }
 
-Window::Window(const char *title, int32_t width, int32_t height, int8_t multisample_size) : m_width(width), m_height(height) {
+void window::initialize(const char *title, int32_t width, int32_t height, int8_t multisample_size) {
+    s_window = new (Window);
+
     // TODO(loanselot): make those hits are editable
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -36,20 +40,24 @@ Window::Window(const char *title, int32_t width, int32_t height, int8_t multisam
 
     glfwWindowHint(GLFW_SAMPLES, multisample_size); // enable 8x MSAA
 
-    m_handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
-    m_width = width;
-    m_height = height;
+    s_window->handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
+    s_window->width = width;
+    s_window->height = height;
 
-    glfwSetWindowUserPointer(m_handle, this);
+    glfwSetWindowUserPointer(s_window->handle, s_window);
 
     // callbacks
-    glfwSetFramebufferSizeCallback(m_handle, framebuffer_size_callback);
-    glfwSetMouseButtonCallback(m_handle, mouse_button_callback);
-    glfwSetCursorPosCallback(m_handle, mouse_position_callback);
+    glfwSetFramebufferSizeCallback(s_window->handle, framebuffer_size_callback);
+    glfwSetMouseButtonCallback(s_window->handle, mouse_button_callback);
+    glfwSetCursorPosCallback(s_window->handle, mouse_position_callback);
 
-    glfwMakeContextCurrent(m_handle);
+    glfwMakeContextCurrent(s_window->handle);
 }
 
-bool Window::should_close() {
-    return glfwWindowShouldClose(m_handle);
+bool window::should_close() {
+    return glfwWindowShouldClose(s_window->handle);
+}
+
+Window *window::get() {
+    return s_window;
 }

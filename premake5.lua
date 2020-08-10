@@ -72,6 +72,7 @@ project "engine"
 
 	filter "system:windows"
 		systemversion "latest"
+		defines "ENGINE_WIN32"
 
 		defines
 		{
@@ -127,6 +128,7 @@ project "game"
 
 	filter "system:windows"
 		systemversion "latest"
+		defines "ENGINE_WIN32"
 		
 	filter "configurations:Debug"
 		defines "ENGINE_DEBUG"

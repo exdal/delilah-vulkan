@@ -19,11 +19,13 @@ enum engine_settings {
 };
 
 struct Engine {
-    Window *m_window;
     
-    Engine(const char *title, glm::vec2 window_size, int flags);
+};
+
+namespace engine {
+    void initialize(const char *title, glm::vec2 window_size, int flags);
     void update_keyboard_input(Window *window, double delta_time);
     void update_mouse_input(int button, int action, int mods);
     void update_mouse_position(glm::vec2 pos);
     void poll();
-};
+}

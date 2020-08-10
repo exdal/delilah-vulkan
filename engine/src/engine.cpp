@@ -1,10 +1,15 @@
 #include "engine.h"
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <renderer/renderer.h>
 
 #define FLAG_HAS(en, flag) (en &= flag == flag)
 
-Engine::Engine(const char *title, glm::vec2 window_size, int flags) {
+static Engine *s_engine;
+
+void engine::initialize(const char *title, glm::vec2 window_size, int flags) {
+    s_engine = new (Engine);
+
     if (glfwInit() != GLFW_TRUE) {
         //logger::logf("Cannot initialize GLFW.\n");
     }
@@ -20,7 +25,7 @@ Engine::Engine(const char *title, glm::vec2 window_size, int flags) {
     else if (FLAG_HAS(flags, ENGINE_AA_X8))
         sample_count = 8;
 
-    m_window = new Window(title, window_size.x, window_size.y, sample_count);
+    window::initialize(title, window_size.x, window_size.y, sample_count);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         // error
@@ -39,8 +44,10 @@ Engine::Engine(const char *title, glm::vec2 window_size, int flags) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
+
+    renderer::set_view(window_size.x, window_size.y);
 }
 
-void Engine::poll() {
+void engine::poll() {
     glfwPollEvents();
 }
