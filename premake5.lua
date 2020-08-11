@@ -79,11 +79,13 @@ project "engine"
 		}
 
 	filter "configurations:Debug"
+		debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
 		defines "ENGINE_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
+		debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
 		defines "ENGINE_RELEASE"
 		runtime "Release"
 		optimize "on"
@@ -104,6 +106,12 @@ project "game"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
+
+	postbuildcommands {
+		"IF NOT EXIST \"../assets\" (mkdir \"../assets\")",
+		"IF NOT EXIST \"../bin/" .. outputdir .. "/%{prj.name}/assets\" (mkdir \"../bin/" .. outputdir .. "/%{prj.name}/assets\")",
+		"xcopy \"../assets\" \"../bin/" .. outputdir .. "/%{prj.name}/assets\" /h /i /c /k /e /r /y "
+	}
 
 	files
 	{
@@ -129,13 +137,15 @@ project "game"
 	filter "system:windows"
 		systemversion "latest"
 		defines "ENGINE_WIN32"
-		
-	filter "configurations:Debug"
+
+	filter "configurations:Debug"	
+		debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
 		defines "ENGINE_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
+		debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
 		defines "ENGINE_RELEASE"
 		runtime "Release"
 		optimize "on"

@@ -1,4 +1,5 @@
 #pragma once
+#include <renderer/shader/shader.h>
 #include <window/window.h>
 #include <glm/vec2.hpp>
 
@@ -19,7 +20,7 @@ enum engine_settings {
 };
 
 struct Engine {
-    
+    Shader main_shader;
 };
 
 namespace engine {
@@ -28,4 +29,6 @@ namespace engine {
     void update_mouse_input(int button, int action, int mods);
     void update_mouse_position(glm::vec2 pos);
     void poll();
+
+    Engine *get();
 }

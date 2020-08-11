@@ -1,32 +1,32 @@
 #include "window.h"
+#include <renderer/renderer.h>
+#include <renderer/camera/camera.h>
+#include <engine.h>
 
 static Window *s_window;
 
 void framebuffer_size_callback(GLFWwindow *handle, int width, int height) {
     auto window = (Window *)glfwGetWindowUserPointer(handle);
-    /*auto camera = window->camera;
+    auto camera = camera::get();
 
     window->width = width;
     window->height = height;
 
     glfwMakeContextCurrent(handle);
-    glViewport(0, 0, width, height);
+    renderer::set_view(width, height);
 
-    camera->aspect = (float)width / (float)height;
     camera->size.x = (float)width;
     camera->size.y = (float)height;
-    camera::update_matrices(camera);
-    camera::update_gui_matrices(camera);*/
+    camera::update_matrices();
 }
 
 void mouse_button_callback(GLFWwindow *handle, int button, int action, int mods) {
-    //engine::update_mouse_input(button, action, mods);
+    engine::update_mouse_input(button, action, mods);
 }
 
 void mouse_position_callback(GLFWwindow *handle, double xpos, double ypos) {
     auto window = (Window *)glfwGetWindowUserPointer(handle);
-    //auto camera = (Camera *)glfwGetWindowUserPointer(handle);
-    //window->mouse_pos = glm::vec2(xpos, ypos);
+    window->mouse_pos = glm::vec2(xpos, ypos);
 }
 
 void window::initialize(const char *title, int32_t width, int32_t height, int8_t multisample_size) {
@@ -38,7 +38,7 @@ void window::initialize(const char *title, int32_t width, int32_t height, int8_t
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    glfwWindowHint(GLFW_SAMPLES, multisample_size); // enable 8x MSAA
+    glfwWindowHint(GLFW_SAMPLES, multisample_size); // enable x MSAA
 
     s_window->handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
     s_window->width = width;
