@@ -1,9 +1,0 @@
-Initializing engine... -- (133)
-Creating window.
-Created window!
-vertex shader path not found.
-fragment shader path not found.
-Loading vertex shader... -- ("assets/shaders/vertex.glsl")
-Loading fragment shader... -- ("assets/shaders/fragment.glsl")
-Compiled both shaders! -- ('assets/shaders/vertex.glsl', 'assets/shaders/fragment.glsl')
-Engine is initialized.

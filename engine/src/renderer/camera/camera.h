@@ -10,10 +10,13 @@ struct Camera {
     glm::vec2 size;
 
     float aspect;
+    float zoom;
 
     glm::mat4 view;
     glm::mat4 projection;
     glm::mat4 gui_projection;
+
+    bool frozen;
 };
 
 namespace camera {
@@ -21,6 +24,7 @@ namespace camera {
     void update_matrices();
     void update_gui_matrices();
     void move(Movement side, double delta_time);
+    void freeze(bool state);
 
     Camera *get();
 }

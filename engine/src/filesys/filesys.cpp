@@ -2,6 +2,9 @@
 #include <utils/logger.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 uint8_t *fsys::get(const char *path, int *sizeout) {
     uint8_t *data = nullptr;
@@ -26,9 +29,5 @@ uint8_t *fsys::get(const char *path, int *sizeout) {
 }
 
 bool fsys::is_exists(const char *path) {
-    if (FILE *f = fopen(path, "r")) {
-        fclose(f);
-        return true;
-    } else
-        return false;
+    return fs::exists(path);
 }

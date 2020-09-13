@@ -17,13 +17,23 @@ void camera::initialize(glm::vec2 pos, glm::vec2 size) {
     s_camera->projection = {};
     s_camera->gui_projection = {};
 
+    s_camera->frozen = true;
+    s_camera->zoom = 1;
+
     update_matrices();
     update_gui_matrices();
 }
 
 void camera::update_matrices() {
-    s_camera->projection = glm::ortho(s_camera->pos.x, s_camera->size.x + s_camera->pos.x, s_camera->size.y + s_camera->pos.y, s_camera->pos.y, -1.f, 1.f);
-    s_camera->gui_projection = glm::ortho(0.f, s_camera->size.x, s_camera->size.y, 0.f, -1.f, 1.f);
+
+    s_camera->projection = glm::ortho(
+        (int)s_camera->pos.x * s_camera->zoom, 
+        ((int)s_camera->size.x + (int)s_camera->pos.x) * s_camera->zoom, 
+        ((int)s_camera->size.y + (int)s_camera->pos.y) * s_camera->zoom, (int)s_camera->pos.y * s_camera->zoom,
+        -100.f, 100.f);
+
+    s_camera->gui_projection = glm::ortho(0.f, s_camera->size.x, s_camera->size.y, 0.f, -100.f, 100.f);
+
     s_camera->view = glm::mat4(1.f);
 }
 
@@ -31,6 +41,9 @@ void camera::update_gui_matrices() {
 }
 
 void camera::move(Movement side, double delta_time) {
+    if (s_camera->frozen)
+        return;
+
     auto velocity = (float)(CAMERA_SPEED * delta_time);
     switch (side) {
         case FORWARD:
@@ -50,6 +63,10 @@ void camera::move(Movement side, double delta_time) {
     }
 
     update_matrices();
+}
+
+void camera::freeze(bool state) {
+    s_camera->frozen = state;
 }
 
 Camera *camera::get() {

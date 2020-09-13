@@ -12,6 +12,6 @@ void gamesave::write(GameSave save, const char *path) {
 }
 
 GameSave gamesave::load(const char *path) {
-    int size;   
-    return *(GameSave*)fsys::get(path, &size); 
+    int size;
+    return *(GameSave *)fsys::get(path, &size);
 }

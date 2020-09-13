@@ -1,7 +1,20 @@
 #pragma once
-#include <renderer/shader/shader.h>
 #include <window/window.h>
 #include <glm/vec2.hpp>
+
+#define ENGINE_NAME "Delilah"
+#define ENGINE_VERSION "v0.1.0"
+#define ENGINE_VERSION_REAL 6600
+#define ENGINE_BUILD "#1"
+#define ENGINE_BUILD_DATE __TIMESTAMP__
+#ifdef DEBUG || ENGINE_DEBUG 
+#define ENGINE_BUILD_TYPE "Debug"
+#else
+#define ENGINE_BUILD_TYPE "Release"
+#endif // DEBUG || ENGINE_DEBUG
+
+#define ENGINE_QUIT_PRESSED 0xee0001 // exit with esc key
+#define ENGINE_QUIT_WNDPROC 0xee0002 // exit using 'x' button
 
 enum engine_settings {
     // window flags
@@ -20,12 +33,14 @@ enum engine_settings {
 };
 
 struct Engine {
-    Shader main_shader;
+    uint8_t engine_state;
 };
 
+struct Window;
 namespace engine {
-    void initialize(const char *title, glm::vec2 window_size, int flags);
-    void update_keyboard_input(Window *window, double delta_time);
+    bool initialize(Window *window, int flags);
+    void update_keyboard_input(double delta_time);
+    void update_mouse_scroll(double xoffset, double yoffset);
     void update_mouse_input(int button, int action, int mods);
     void update_mouse_position(glm::vec2 pos);
     void poll();

@@ -17,16 +17,16 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- our include dir
 IncludeDir = {}
-IncludeDir["glad"] = "vendor/glad/include"
-IncludeDir["GLFW"] = "vendor/glfw/include"
 IncludeDir["glm"] = "vendor/glm"
+IncludeDir["GLFW"] = "vendor/glfw/include"
 IncludeDir["stb_image"] = "vendor/stb_image"
+IncludeDir["freetype2"] = "vendor/freetype2/include"
 IncludeDir["entt"] = "vendor/entt/include"
 
 group "Dependencies"
 	include "vendor/glfw"
-	include "vendor/glad"
 	include "vendor/glm"
+	include "vendor/freetype2"
 group ""
 
 project "engine"
@@ -35,6 +35,7 @@ project "engine"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "on"
+	characterset "MBCS"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
@@ -55,19 +56,20 @@ project "engine"
 
 	includedirs
 	{
+		"game/src",
 		"%{prj.name}/src",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.glad}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.freetype2}",
+		"%{IncludeDir.entt}",
+		"$(VULKAN_SDK)/include"
 	}
 
 	links 
 	{ 
 		"GLFW",
-		"glad",
-		"opengl32.lib"
+		"freetype2"
 	}
 
 	filter "system:windows"
@@ -80,22 +82,30 @@ project "engine"
 
 	filter "configurations:Debug"
 		debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
-		defines "ENGINE_DEBUG"
+		defines { "ENGINE_DEBUG", "DEBUG" }
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
 		debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
-		defines "ENGINE_RELEASE"
+		defines { "ENGINE_RELEASE", "NDEBUG" }
 		runtime "Release"
 		optimize "on"
 		symbols "off"
 
 	filter "platforms:x86"
         architecture "x86"
+        links 
+		{
+			"$(VULKAN_SDK)/lib32/vulkan-1.lib"
+		}
 
     filter "platforms:x64"
         architecture "x86_64"
+        links 
+		{
+			"$(VULKAN_SDK)/lib/vulkan-1.lib"
+		}
 
 project "game"
 	location "game"
@@ -103,14 +113,16 @@ project "game"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "on"
-
+	characterset "MBCS"
+	
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
 
 	postbuildcommands {
-		"IF NOT EXIST \"../assets\" (mkdir \"../assets\")",
-		"IF NOT EXIST \"../bin/" .. outputdir .. "/%{prj.name}/assets\" (mkdir \"../bin/" .. outputdir .. "/%{prj.name}/assets\")",
-		"xcopy \"../assets\" \"../bin/" .. outputdir .. "/%{prj.name}/assets\" /h /i /c /k /e /r /y "
+		"IF NOT EXIST \"../game_content\" (mkdir \"../game_content\")",
+		"del /f ..\\bin\\" .. outputdir .. "\\%{prj.name}\\**.lib",
+		"del /f ..\\bin\\" .. outputdir .. "\\%{prj.name}\\**.exp",
+		"xcopy \"../game_content\" \"../bin/" .. outputdir .. "/%{prj.name}\" /h /i /c /k /e /r /y "
 	}
 
 	files
@@ -122,16 +134,19 @@ project "game"
 	includedirs
 	{
 		"engine/src",
+		"%{prj.name}/src",
 		"vendor",
+		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.glad}"
+		"%{IncludeDir.freetype2}",
+		"$(VULKAN_SDK)/include"
 	}
 
 	links
 	{
-		"Engine"
+		"engine",
+		"freetype2"
 	}
 
 	filter "system:windows"
@@ -140,19 +155,27 @@ project "game"
 
 	filter "configurations:Debug"	
 		debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
-		defines "ENGINE_DEBUG"
+		defines { "ENGINE_DEBUG", "DEBUG" }
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
 		debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
-		defines "ENGINE_RELEASE"
+		defines { "ENGINE_RELEASE", "NDEBUG" }
 		runtime "Release"
 		optimize "on"
 		symbols "off"
 
 	filter "platforms:x86"
         architecture "x86"
+        links 
+		{
+			"$(VULKAN_SDK)/lib32/vulkan-1.lib"
+		}
 
     filter "platforms:x64"
         architecture "x86_64"
+        links 
+		{
+			"$(VULKAN_SDK)/lib/vulkan-1.lib"
+		}
