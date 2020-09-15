@@ -15,6 +15,8 @@
 static const std::vector<const char *> validation_layers = { "VK_LAYER_KHRONOS_validation" };
 static const std::vector<const char *> device_extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
+static const int MAX_FRAMES_IN_FLIGHT = 2;
+
 #ifdef NDEBUG
 static const bool enable_vl = false;
 #else
