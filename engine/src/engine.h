@@ -1,4 +1,5 @@
 #pragma once
+#include <renderer/shader/shader.h>
 #include <window/window.h>
 #include <glm/vec2.hpp>
 
@@ -13,9 +14,6 @@
 #define ENGINE_BUILD_TYPE "Release"
 #endif // DEBUG || ENGINE_DEBUG
 
-#define ENGINE_QUIT_PRESSED 0xee0001 // exit with esc key
-#define ENGINE_QUIT_WNDPROC 0xee0002 // exit using 'x' button
-
 enum engine_settings {
     // window flags
     ENGINE_VSYNC = 1 << 0,
@@ -26,19 +24,19 @@ enum engine_settings {
     ENGINE_DEPTH = 1 << 3,
 
     // aa flags
-    ENGINE_AA_X0 = 1 << 4, // this disables AA
-    ENGINE_AA_X2 = 1 << 5,
-    ENGINE_AA_X4 = 1 << 6,
-    ENGINE_AA_X8 = 1 << 7
+    ENGINE_AA_X2 = 1 << 4, // this disables AA
+    ENGINE_AA_X4 = 1 << 5,
+    ENGINE_AA_X8 = 1 << 6
 };
 
 struct Engine {
+    Shader main_shader;
+    Shader blur_shader;
     uint8_t engine_state;
 };
 
-struct Window;
 namespace engine {
-    bool initialize(Window *window, int flags);
+    void initialize(const char *title, glm::vec2 window_size, int flags);
     void update_keyboard_input(double delta_time);
     void update_mouse_scroll(double xoffset, double yoffset);
     void update_mouse_input(int button, int action, int mods);

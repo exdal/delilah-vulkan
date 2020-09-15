@@ -5,7 +5,7 @@
 #pragma pack(push, 1)
 struct GameSave {
     uint8_t engine_state;
-    int32_t refresh_rt;
+    float zoom;
 };
 #pragma pack(pop)
 

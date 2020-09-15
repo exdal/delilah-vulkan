@@ -1,5 +1,5 @@
 workspace "Delilah"
-    platforms { "x86", "x86_64" }
+    platforms { "x86", "x64" }
     startproject "Game"
 
     configurations
@@ -20,13 +20,10 @@ IncludeDir = {}
 IncludeDir["glm"] = "vendor/glm"
 IncludeDir["GLFW"] = "vendor/glfw/include"
 IncludeDir["stb_image"] = "vendor/stb_image"
-IncludeDir["freetype2"] = "vendor/freetype2/include"
-IncludeDir["entt"] = "vendor/entt/include"
 
 group "Dependencies"
 	include "vendor/glfw"
 	include "vendor/glm"
-	include "vendor/freetype2"
 group ""
 
 project "engine"
@@ -61,15 +58,12 @@ project "engine"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
-		"%{IncludeDir.freetype2}",
-		"%{IncludeDir.entt}",
 		"$(VULKAN_SDK)/include"
 	}
 
 	links 
 	{ 
-		"GLFW",
-		"freetype2"
+		"GLFW"
 	}
 
 	filter "system:windows"
@@ -138,15 +132,12 @@ project "game"
 		"vendor",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}",
-		"%{IncludeDir.freetype2}",
 		"$(VULKAN_SDK)/include"
 	}
 
 	links
 	{
-		"engine",
-		"freetype2"
+		"engine"
 	}
 
 	filter "system:windows"

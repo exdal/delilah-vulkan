@@ -2,45 +2,61 @@
 #include <engine.h>
 #include <filesys/gamesave.h>
 #include <filesys/filesys.h>
-#include <renderer/renderer.h>
-#include <scenes/TestScene.h>
-#include <app/app.h>
-
-#include <Windows.h>
+#include <chrono>
+#include <thread>
+#include <renderer/vulkan/vk_renderer.h>
 
 static Game *s_game;
+
+void calc_fps() {
+    auto current_frame = glfwGetTime();
+    s_game->frames++;
+    s_game->delta_time = current_frame - s_game->last_frame;
+    s_game->last_frame = current_frame;
+    if (current_frame - s_game->fps_last_frame >= 1) {
+        s_game->fps_last_frame += 1;
+        s_game->fps = s_game->frames;
+        s_game->frames = 0;
+    }
+}
 
 void game::initialize(const char *title) {
     s_game = new (Game);
 
     if (!fsys::is_exists("state"))
-        gamesave::write({ ENGINE_AA_X8 | ENGINE_BLEND, 1 }, "state");
+        gamesave::write({ ENGINE_AA_X2, 1 }, "state");
 
     GameSave save = gamesave::load("state");
 
-    s_game->app = new (App);
-    //s_game->app->initialize(title, { GetSystemMetrics(SM_CXSCREEN) - 10, GetSystemMetrics(SM_CYSCREEN) - 50 }, { 10, 10 });
-    s_game->app->initialize(title, 1280, 768);
+    engine::initialize(title, glm::vec2(1280, 780), save.engine_state);
+    //assetmgr::initialize();
 
-    if (!s_game->app->current_scene)
-        s_game->app->current_scene = scene::create<TestScene>();
-
-    s_game->app->current_scene->initialize();
-}
+    camera::get()->zoom = save.zoom;
+    camera::update_matrices();
+    }
 
 void game::set_scene(Scene *scene) {
-    s_game->app->current_scene = scene;
+    s_game->current_scene = scene;
 }
 
 void game::run() {
-    s_game->app->run();
+    while (!window::should_close()) {
+        s_game->begin = std::chrono::steady_clock::now();
+        calc_fps();
+
+        renderer::draw_frame();
+
+        engine::update_keyboard_input(s_game->delta_time);
+        engine::poll();
+
+        s_game->end = std::chrono::steady_clock::now();
+        s_game->elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(s_game->end - s_game->begin).count();
+    }
 }
 
 void game::deinitialize() {
-    if (s_game->app->current_scene)
-        s_game->app->current_scene->deinitialize();
 
-    gamesave::write({ engine::get()->engine_state, 0 }, "state");
+    gamesave::write({ engine::get()->engine_state, camera::get()->zoom }, "state");
 }
 
 Game *game::get() {

@@ -2,10 +2,24 @@
 #include <chrono>
 #include <string>
 
-struct App;
 struct Scene;
+struct Font;
+struct FrameBuffer;
 struct Game {
-    App *app;
+    double delta_time = 0;
+    double last_frame = 0;
+    double fps_last_frame = 0;
+    int frames = 0;
+    int fps = 0;
+
+    Scene *current_scene = nullptr;
+
+    std::chrono::steady_clock::time_point begin;
+    std::chrono::steady_clock::time_point end;
+    uint32_t elapsed_ms;
+
+    Font *font22;
+    FrameBuffer *main_framebuffer;
 };
 
 namespace game {
