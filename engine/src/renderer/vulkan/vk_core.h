@@ -32,13 +32,12 @@ struct VulkanCore {
     VkCommandPool command_pool;
     std::vector<VkCommandBuffer> command_buffers;
 
-    VkSemaphore image_semp;
-    VkSemaphore render_finished_semp;
-
     std::vector<VkSemaphore> image_semaphores;
     std::vector<VkSemaphore> render_finish_semaphores;
     std::vector<VkFence> fences;
     std::vector<VkFence> fence_images;
+
+    bool resized = false;
 };
 
 struct QueueFamilyIndices {
@@ -52,6 +51,8 @@ struct QueueFamilyIndices {
 
 namespace _vk::_core {
     void initialize(Window *window);
+    void clean();
+    void resize();
     void init_surface(Window *window);
     void init_image_views();
 

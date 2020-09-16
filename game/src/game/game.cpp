@@ -33,7 +33,9 @@ void game::initialize(const char *title) {
 
     camera::get()->zoom = save.zoom;
     camera::update_matrices();
-    }
+
+    renderer::initialize();
+}
 
 void game::set_scene(Scene *scene) {
     s_game->current_scene = scene;
@@ -55,7 +57,6 @@ void game::run() {
 }
 
 void game::deinitialize() {
-
     gamesave::write({ engine::get()->engine_state, camera::get()->zoom }, "state");
 }
 

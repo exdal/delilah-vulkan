@@ -6,5 +6,6 @@ struct VulkanRenderer {
 };
 
 namespace renderer {
+    void initialize();
     void draw_frame();
 }

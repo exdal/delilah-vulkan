@@ -1,17 +1,27 @@
 #include "vk_config.h"
 #include "vk_renderer.h"
 #include <utils/logger.h>
+#include <stdexcept>
 
 static VulkanRenderer *s_renderer;
 
-void renderer::draw_frame() {
+void renderer::initialize() {
     s_renderer = new (VulkanRenderer);
+}
+
+void renderer::draw_frame() {
     VulkanCore *core = _vk::_core::get();
 
     vkWaitForFences(core->device, 1, &core->fences[s_renderer->current_frame], VK_TRUE, UINT64_MAX);
 
     uint32_t image_index = 0;
-    vkAcquireNextImageKHR(core->device, core->swap_chain, UINT64_MAX, core->image_semaphores[s_renderer->current_frame], VK_NULL_HANDLE, &image_index);
+    VkResult result = vkAcquireNextImageKHR(core->device, core->swap_chain, UINT64_MAX, core->image_semaphores[s_renderer->current_frame], VK_NULL_HANDLE, &image_index);
+
+    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        _vk::_core::resize();
+    }
+    else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        throw std::runtime_error("failed to acquire swap chain image!");
 
     // Check if a previous frame is using this image (i.e. there is its fence to wait on)
     if (core->fence_images[image_index] != VK_NULL_HANDLE) {
@@ -54,7 +64,15 @@ void renderer::draw_frame() {
     presentInfo.pImageIndices = &image_index;
     presentInfo.pResults = nullptr;
 
-    vkQueuePresentKHR(core->present_queue, &presentInfo);
+    vkQueueWaitIdle(core->graphics_queue);
+
+    result = vkQueuePresentKHR(core->present_queue, &presentInfo);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || _vk::_core::get()->resized) {
+        _vk::_core::get()->resized = false;
+        _vk::_core::resize();
+    }
+    else if (result != VK_SUCCESS)
+        throw std::runtime_error("failed to present swap chain image!");
 
     vkQueueWaitIdle(core->present_queue);
     s_renderer->current_frame = (s_renderer->current_frame + 1) % MAX_FRAMES_IN_FLIGHT;

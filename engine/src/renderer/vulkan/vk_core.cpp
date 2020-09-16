@@ -61,8 +61,8 @@ void _vk::_core::initialize(Window *window) {
     
     s_core->pipeline_layout = _vk::_graphics_pipeline::initialize(s_core, 0, 1.f);
 
-    vkDestroyShaderModule(s_core->device, s_core->vertex_shader, nullptr);
-    vkDestroyShaderModule(s_core->device, s_core->fragment_shader, nullptr);
+    /*vkDestroyShaderModule(s_core->device, s_core->vertex_shader, nullptr);
+    vkDestroyShaderModule(s_core->device, s_core->fragment_shader, nullptr);*/
 
     // create frame buffers
 
@@ -75,6 +75,43 @@ void _vk::_core::initialize(Window *window) {
     // create idk
 
     _vk::_semaphores::initialize(s_core);
+}
+
+void _vk::_core::clean() {
+    _vk::_swap_chain::clean(s_core);
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vkDestroySemaphore(s_core->device, s_core->render_finish_semaphores[i], nullptr);
+        vkDestroySemaphore(s_core->device, s_core->image_semaphores[i], nullptr);
+        vkDestroyFence(s_core->device, s_core->fences[i], nullptr);
+    }
+
+    vkDestroyCommandPool(s_core->device, s_core->command_pool, nullptr);
+
+    vkDestroyDevice(s_core->device, nullptr);
+
+    if (enable_vl) {
+        DestroyDebugUtilsMessengerEXT(s_core->instance, s_core->debug_messenger, nullptr);
+    }
+
+    vkDestroySurfaceKHR(s_core->instance, s_core->surface, nullptr);
+    vkDestroyInstance(s_core->instance, nullptr);
+}
+
+void _vk::_core::resize() {
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(window::get()->handle, &width, &height);
+    while (width == 0 || height == 0) {
+        glfwGetFramebufferSize(window::get()->handle, &width, &height);
+        glfwWaitEvents();
+    }
+
+    _vk::_swap_chain::recreate(s_core);
+    init_image_views();
+    _vk::_render_pass::initialize(s_core);
+    s_core->pipeline_layout = _vk::_graphics_pipeline::initialize(s_core, 0, 1.f);
+    _vk::_framebuffer::initialize(s_core);
+    _vk::_command_pool::initialize(s_core);
 }
 
 void _vk::_core::init_surface(Window *window) {

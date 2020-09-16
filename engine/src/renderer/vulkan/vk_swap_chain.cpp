@@ -15,7 +15,7 @@ void _vk::_swap_chain::initialize(VulkanCore *core) {
     createInfo.surface = core->surface;
 
     VkSurfaceFormatKHR surface_format = _vk::_swap_chain::get_swap_surface_format(vsc.formats);
-    VkExtent2D extent = _vk::_swap_chain::get_swap_extent(vsc.capabilities, window::get()->width, window::get()->height);
+    VkExtent2D extent = _vk::_swap_chain::get_swap_extent(vsc.capabilities);
 
     core->swap_chain_extent = extent;
     core->swap_chain_image_format = surface_format.format;
@@ -52,6 +52,30 @@ void _vk::_swap_chain::initialize(VulkanCore *core) {
     vkGetSwapchainImagesKHR(core->device, core->swap_chain, &image_count, nullptr);
     core->swap_chain_images.resize(image_count);
     vkGetSwapchainImagesKHR(core->device, core->swap_chain, &image_count, core->swap_chain_images.data());
+}
+
+void _vk::_swap_chain::clean(VulkanCore *core) {
+    for (auto framebuffer : core->framebuffers) {
+        vkDestroyFramebuffer(core->device, framebuffer, nullptr);
+    }
+
+    vkFreeCommandBuffers(core->device, core->command_pool, core->command_buffers.size(), core->command_buffers.data());
+
+    vkDestroyPipeline(core->device, core->graphics_pipeline, nullptr);
+    vkDestroyPipelineLayout(core->device, core->pipeline_layout, nullptr);
+    vkDestroyRenderPass(core->device, core->render_pass, nullptr);
+
+    for (auto imageView : core->swap_chain_image_views) {
+        vkDestroyImageView(core->device, imageView, nullptr);
+    }
+
+    vkDestroySwapchainKHR(core->device, core->swap_chain, nullptr);
+}
+
+void _vk::_swap_chain::recreate(VulkanCore *core) {
+    vkDeviceWaitIdle(core->device);
+    clean(core);
+    initialize(core);
 }
 
 VulkanSwapChain _vk::_swap_chain::query_swap_chain(VkPhysicalDevice device, VkSurfaceKHR surface) {
@@ -95,11 +119,15 @@ VkPresentModeKHR _vk::_swap_chain::get_swap_present_mode(const std::vector<VkPre
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-VkExtent2D _vk::_swap_chain::get_swap_extent(const VkSurfaceCapabilitiesKHR &capabilities, uint32_t width, uint32_t height) {
+VkExtent2D _vk::_swap_chain::get_swap_extent(const VkSurfaceCapabilitiesKHR &capabilities) {
     if (capabilities.currentExtent.width != UINT32_MAX)
         return capabilities.currentExtent;
     else {
-        VkExtent2D extend = { width, height };
+        int width, height;
+        if (window::get())
+            glfwGetFramebufferSize(window::get()->handle, &width, &height);
+
+        VkExtent2D extend = { (uint32_t)width, (uint32_t)height };
 
         extend.width = std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, extend.width));
         extend.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, extend.height));

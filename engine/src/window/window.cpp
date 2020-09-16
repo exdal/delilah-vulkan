@@ -4,23 +4,13 @@
 #include <engine.h>
 #include <game/game.h>
 #include <utils/utils.h>
+#include <renderer/vulkan/vk_core.h>
 
 static Window *s_window;
 
 void framebuffer_size_callback(GLFWwindow *handle, int width, int height) {
-    auto window = (Window *)glfwGetWindowUserPointer(handle);
-    auto camera = camera::get();
-
-    window->width = width;
-    window->height = height;
-
-    glfwMakeContextCurrent(handle);
-
-    camera->size.x = (float)width;
-    camera->size.y = (float)height;
-    if (game::get()->main_framebuffer) {
-    }
-    camera::update_matrices();
+    if (_vk::_core::get())
+        _vk::_core::get()->resized = true;
 }
 
 void mouse_scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
